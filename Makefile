@@ -1,20 +1,10 @@
-TARGET_MODULE:=thinhnguyen
-# If we are running by kernel building system
-ifneq ($(KERNELRELEASE),)
-	$(TARGET_MODULE)-objs := main.o
-	obj-m := $(TARGET_MODULE).o
-# If we running without kernel build system
-else
-	BUILDSYSTEM_DIR:=/lib/modules/$(shell uname -r)/build
-	PWD:=$(shell pwd)
-all : 
-# run kernel build system to make module
-	$(MAKE) -C $(BUILDSYSTEM_DIR) M=$(PWD) modules
+obj-m := hello_world.o
+SRC := $(shell pwd)
+all:
+	$(MAKE) -C $(KERNEL_SRC) M=$(SRC)
+modules_install:
+	$(MAKE) -C $(KERNEL_SRC) M=$(SRC) modules_install
 clean:
-# run kernel build system to cleanup in current directory
-	$(MAKE) -C $(BUILDSYSTEM_DIR) M=$(PWD) clean
-load:
-	insmod ./$(TARGET_MODULE).ko
-unload:
-	rmmod ./$(TARGET_MODULE).ko
-endif
+	rm -f *.o *~ core .depend .*.cmd *.ko *.mod.c
+	rm -f Module.markers Module.symvers modules.order
+	rm -rf .tmp_versions Modules.symvers
